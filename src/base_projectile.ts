@@ -1,5 +1,6 @@
 import { Container, Graphics } from "pixi.js";
 import { Vector2D } from "./interfaces";
+import { VectorDistance } from "./vactor_helpers";
 
 enum AimingTypes {
     "direct" = 1,
@@ -76,11 +77,11 @@ export class BaseProjectile {
 export class DP150 extends BaseProjectile {
     static typeName: string = "dp150";
     //visual props
-    public size: number = 4;
+    public size: number = 2;
     public color: string = "#FF00FF";
     //
 
-    protected speed: number = 1000;
+    protected speed: number = 1600;
     protected aimingType: AimingTypes = 1;
 
     constructor(id: string, startingPoint: Vector2D, targetPoint: Vector2D) {
@@ -88,7 +89,8 @@ export class DP150 extends BaseProjectile {
 
         this.position = {x: startingPoint.x, y: startingPoint.y};
 
-        const dist = Math.sqrt((targetPoint.x - startingPoint.x)**2 + (targetPoint.y - startingPoint.y)**2);
+        // const dist = Math.sqrt((targetPoint.x - startingPoint.x)**2 + (targetPoint.y - startingPoint.y)**2);
+        const dist = VectorDistance(startingPoint, targetPoint);
         this.finishTime = dist/this.speed;
     }
 }
@@ -96,11 +98,11 @@ export class DP150 extends BaseProjectile {
 export class BP150 extends BaseProjectile {
     static typeName: string = "bp150";
     //visual props
-    public size: number = 6;
+    public size: number = 4;
     public color: string = "#FF0000";
     //
 
-    protected speed: number = 600;
+    protected speed: number = 1000;
     protected aimingType: AimingTypes = 1;
 
     constructor(id: string, startingPoint: Vector2D, targetPoint: Vector2D) {

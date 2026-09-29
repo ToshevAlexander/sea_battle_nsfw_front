@@ -1,7 +1,8 @@
 import { Container, Graphics } from "pixi.js";
-import { CombatArea } from "./base";
+import { BaseShip, CombatArea } from "./base";
 import { BaseProjectile } from "./base_projectile";
 import { Vector2D } from "./interfaces";
+import { VectorDistance } from "./vactor_helpers";
 
 export class BaseWeapon {
     //visual props
@@ -18,13 +19,19 @@ export class BaseWeapon {
 
     public container: Container = new Container();
 
-    public update(timeDelta: number, CA: CombatArea) {
+    public update(timeDelta: number, CA: CombatArea, targets: BaseShip[]) {
         this.currentFCD += timeDelta;
 
-        if (this.currentFCD > this.fireCD) {
+        const activeTargets = this.getTargetsInRange(CA, targets);
+
+        if (this.currentFCD < this.fireCD) { return; }
+
+        const target = activeTargets[0];
+
+        if (target && target.distance <= this.range) {
             const globalP = this.container.getGlobalPosition();
             const startingPoint = {x: globalP.x, y: globalP.y};
-            const targetPoint = {x: startingPoint.x, y: startingPoint.y + 400};
+            const targetPoint = target.target;
 
             const state = this.fireProjectile(startingPoint, targetPoint);
 
@@ -40,8 +47,18 @@ export class BaseWeapon {
 
     }
 
-    getTargetsInRange(targets: any[]) {
+    getTargetsInRange(CA: CombatArea, targets: BaseShip[]) {
+        const wPos = this.container.getGlobalPosition();
+        const dt = targets.map((ship) => {
+            const dist = VectorDistance(wPos, ship.container.position);
+            
+            return {
+                distance: dist,
+                target: ship.container.position
+            }
+        });
 
+        return dt;
     }
 
     fireProjectile(start: Vector2D, target: Vector2D) {
@@ -63,8 +80,8 @@ export class Howitzer extends BaseWeapon {
     public color: string = "#ffff00";
 
     static typeName = 'howitzer';
-    protected range = 600;
-    protected fireCD = 5;
+    protected range = 1200;
+    protected fireCD = 2;
     protected projectileType = "bp150";
 
     public async init() {
@@ -79,8 +96,8 @@ export class AK630 extends BaseWeapon {
     public color: string = "#0000ff";
 
     static typeName = 'ak630';
-    protected range = 200;
-    protected fireCD = 1;
+    protected range = 400;
+    protected fireCD = 0.2;
     protected projectileType = "dp150";
 
     public async init() {

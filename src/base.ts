@@ -44,7 +44,11 @@ export class BaseShip {
                 this.weaponsList.push(newWeapon);
             }
         })
+    }
 
+    private findTargets(CA: CombatArea) {
+        const otherShips = CA.activeObjecs.filter((ship) => ship.id !== this.id);
+        return otherShips;
     }
 
     public logStatus(session_id: string) {
@@ -120,9 +124,10 @@ export class BaseShip {
 
     public update(timeDelta: number, CA: CombatArea) {
         this.move(timeDelta);
+        const targets = this.findTargets(CA);
 
         this.weaponsList.forEach((wep) => {
-            wep.update(timeDelta, CA)
+            wep.update(timeDelta, CA, targets)
         })
 
         // this.logStatus();
