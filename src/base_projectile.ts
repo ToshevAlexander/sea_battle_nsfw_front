@@ -76,7 +76,7 @@ export class BaseProjectile {
 export class DP150 extends BaseProjectile {
     static typeName: string = "dp150";
     //visual props
-    public size: number = 2;
+    public size: number = 4;
     public color: string = "#FF00FF";
     //
 
@@ -96,7 +96,7 @@ export class DP150 extends BaseProjectile {
 export class BP150 extends BaseProjectile {
     static typeName: string = "bp150";
     //visual props
-    public size: number = 4;
+    public size: number = 6;
     public color: string = "#FF0000";
     //
 

@@ -1,3 +1,4 @@
+import { Container, Graphics } from "pixi.js";
 import { CombatArea } from "./base";
 import { BaseProjectile } from "./base_projectile";
 import { Vector2D } from "./interfaces";
@@ -15,19 +16,17 @@ export class BaseWeapon {
 
     protected projectileType: string;
 
+    public container: Container = new Container();
+
     public update(timeDelta: number, CA: CombatArea) {
         this.currentFCD += timeDelta;
 
-
         if (this.currentFCD > this.fireCD) {
-            const startingPoint = {x: 400, y: 400};
+            const globalP = this.container.getGlobalPosition();
+            const startingPoint = {x: globalP.x, y: globalP.y};
             const targetPoint = {x: startingPoint.x, y: startingPoint.y + 400};
 
-            console.log(startingPoint, targetPoint);
-
             const state = this.fireProjectile(startingPoint, targetPoint);
-
-            console.log(state);
 
             if (state.success) {
                 state.projectile.init();
@@ -35,6 +34,10 @@ export class BaseWeapon {
                 CA.container.addChild(state.projectile.container);
             }
         }
+    }
+
+    init() {
+
     }
 
     getTargetsInRange(targets: any[]) {
@@ -63,6 +66,11 @@ export class Howitzer extends BaseWeapon {
     protected range = 600;
     protected fireCD = 5;
     protected projectileType = "bp150";
+
+    public async init() {
+        const shape = new Graphics().rect(-this.size/2, -this.size/2, this.size, this.size).fill(this.color);
+        this.container.addChild(shape);
+    }
 }
 
 export class AK630 extends BaseWeapon {
@@ -74,4 +82,9 @@ export class AK630 extends BaseWeapon {
     protected range = 200;
     protected fireCD = 1;
     protected projectileType = "dp150";
+
+    public async init() {
+        const shape = new Graphics().rect(-this.size/2, -this.size/2, this.size, this.size).fill(this.color);
+        this.container.addChild(shape);
+    }
 }

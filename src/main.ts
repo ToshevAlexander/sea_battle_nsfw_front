@@ -28,8 +28,7 @@ import { saveData } from "./backend_service";
       type: "fregate",
       position: {x: 40, y: 450},
       direction: 90,
-      // weaponConfig: ['howitzer', 'ak630']
-      weaponConfig: []
+      weaponConfig: ['howitzer', 'ak630'],
     }
   ];
 

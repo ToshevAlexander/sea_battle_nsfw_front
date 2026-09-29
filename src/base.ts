@@ -82,13 +82,13 @@ export class BaseShip {
         // this.container.addChild(shipBow);
 
         this.weaponsList.forEach((weapon: BaseWeapon, index: number) => {
-            const shapeW = new Graphics().rect(-weapon.size/2, -weapon.size/2, weapon.size, weapon.size).fill(weapon.color);
+            weapon.init();
             const weaponSlot = this.weaponSlots[index];
 
             if (weaponSlot) {
-                shapeW.position.set(weaponSlot.position.x * width/2, weaponSlot.position.y * height/2);
-                console.log(shapeW);
-                this.container.addChild(shapeW);
+                weapon.container.position.set(weaponSlot.position.x * width/2, weaponSlot.position.y * height/2);
+                
+                this.container.addChild(weapon.container);
             }
 
         });
