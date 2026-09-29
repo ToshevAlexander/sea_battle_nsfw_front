@@ -1,6 +1,7 @@
 import { Container, Graphics, Assets, Sprite } from "pixi.js";
 import { saveData } from "./backend_service";
 import { AK630, BaseWeapon, Howitzer } from "./base_weapon";
+import { BaseProjectile } from "./base_projectile";
 
 interface IWeaponSlot {
     position: {x: number; y: number;}
@@ -91,7 +92,6 @@ export class BaseShip {
             }
 
         });
-
     }
 
     public setPosition(x, y) {
@@ -118,16 +118,20 @@ export class BaseShip {
         this.moveVector.y = newY;
     }
 
-    public update(timeDelta: number, CASize: AreaSizeType) {
+    public update(timeDelta: number, CA: CombatArea) {
         this.move(timeDelta);
+
+        this.weaponsList.forEach((wep) => {
+            wep.update(timeDelta, CA)
+        })
 
         // this.logStatus();
 
-        if ((this.position.y <= 0 && this.moveVector.y < 0) || (this.position.y >= CASize.height && this.moveVector.y > 0)) {
+        if ((this.position.y <= 0 && this.moveVector.y < 0) || (this.position.y >= CA.size.height && this.moveVector.y > 0)) {
             this.moveVector.y = -this.moveVector.y;
         }
 
-        if ((this.position.x <= 0 && this.moveVector.x < 0) || (this.position.x >= CASize.width && this.moveVector.x > 0)) {
+        if ((this.position.x <= 0 && this.moveVector.x < 0) || (this.position.x >= CA.size.width && this.moveVector.x > 0)) {
             this.moveVector.x = -this.moveVector.x;
         }
 
@@ -189,9 +193,10 @@ export type AreaSizeType = { height: number; width: number };
 
 export class CombatArea {
     private stage: any;
-    private container: Container = new Container();
-    private size: AreaSizeType;
-    private activeObjecs: BaseShip[] = [];
+    public container: Container = new Container();
+    public size: AreaSizeType;
+    public activeObjecs: BaseShip[] = [];
+    public activeProjectiles: BaseProjectile[] = [];
 
     private logsUpdated: boolean = false;
 
@@ -226,7 +231,21 @@ export class CombatArea {
 
     update(t: number, totalTime: number, session_id: string) {
         this.activeObjecs.forEach((item) => {
-            item.update(t, this.size);
+            item.update(t, this);
+        });
+
+        this.activeProjectiles.forEach((item) => {
+            if (item.active) {
+                item.update(t);
+            }
+        });
+
+        this.activeProjectiles = this.activeProjectiles.filter((item) => {
+            if (!item.active) {
+                this.container.removeChild(item.container);
+            }
+
+            return item.active;
         });
 
         const iterationS = Math.floor((totalTime/1000)%5);
