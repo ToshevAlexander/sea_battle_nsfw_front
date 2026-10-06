@@ -21,13 +21,14 @@ export class BaseProjectile {
     protected finishTime: number;
     //
 
+    protected startingSpeed: number;
     protected speed: number;
     protected aimingType: AimingTypes = 1;
 
     protected spread: number;
 
     protected startingPoint: Vector2D;
-    protected targetPoint: Vector2D;
+    protected direction: Vector2D;
 
     public container: Container = new Container();
 
@@ -39,42 +40,39 @@ export class BaseProjectile {
         this.startingPoint = startingPoint;
     }
 
-    public getTargetPoint(targetPoint: Vector2D) {
-        const targetVector = {
-            x: targetPoint.x - this.startingPoint.x,
-            y: targetPoint.y - this.startingPoint.y
+    public getDirection(startingPoint: Vector2D, targetPoint: Vector2D) {
+        const dirVectorBase = {
+            x: targetPoint.x - startingPoint.x,
+            y: targetPoint.y - startingPoint.y
+        };
+
+        const length = Math.sqrt(dirVectorBase.x**2 + dirVectorBase.y**2);
+
+        const dirVectorNorm = {
+            x: dirVectorBase.x/length,
+            y: dirVectorBase.y/length,
         };
 
         const ang = ((this.spread*2) * Math.random()) - this.spread;
 
-        const rV = {
-            x: targetVector.x * Math.cos(ang) - targetVector.y * Math.sin(ang),
-            y: targetVector.x * Math.sin(ang) + targetVector.y * Math.cos(ang)
+        const dSpread = {
+            x: dirVectorNorm.x * Math.cos(ang) - dirVectorNorm.y * Math.sin(ang),
+            y: dirVectorNorm.x * Math.sin(ang) + dirVectorNorm.y * Math.cos(ang)
         };
 
-        const newTP = {
-            x: this.startingPoint.x + rV.x,
-            y: this.startingPoint.y + rV.y,
-        }
-
-        return newTP;
+        return dSpread;
     }
 
     public update(timeDelta: number) {
         this.currentTime += timeDelta;
-        const timeStep = (this.currentTime/(this.finishTime));
 
-        if (timeStep >= 1) {
-            this.active = false;
-        }
-
-        const distX = this.targetPoint.x - this.startingPoint.x;
-        const distY = this.targetPoint.y - this.startingPoint.y;
-
-        this.position.x = this.startingPoint.x + distX * timeStep;
-        this.position.y = this.startingPoint.y + distY * timeStep;
+        this.position.x += this.direction.x * (this.speed*timeDelta);
+        this.position.y += this.direction.y * (this.speed*timeDelta);
 
         this.container.position.set(this.position.x, this.position.y);
+
+        this.speed *= 0.98;
+        if (this.currentTime >= 2.5 || this.speed < 100) {this.active = false;}
     }
 
     static createProjectile(pt: string, startingPoint: Vector2D, targetPoint: Vector2D) {
@@ -103,18 +101,17 @@ export class DP150 extends BaseProjectile {
     public color: string = "#FFFFFF";
     //
 
-    protected speed: number = 1600;
+    protected startingSpeed: number = 1600;
     protected aimingType: AimingTypes = 1;
     protected spread: number = Math.PI/18;
 
     constructor(id: string, startingPoint: Vector2D, targetPoint: Vector2D) {
         super(id, startingPoint);
 
-        this.targetPoint = this.getTargetPoint(targetPoint);
+        this.direction = this.getDirection(startingPoint, targetPoint);
         this.position = {x: startingPoint.x, y: startingPoint.y};
 
-        const dist = VectorDistance(startingPoint, this.targetPoint);
-        this.finishTime = dist/this.speed;
+        this.speed = this.startingSpeed;
     }
 }
 
@@ -125,18 +122,16 @@ export class BP150 extends BaseProjectile {
     public color: string = "#FFFFBB";
     //
 
-    protected speed: number = 1000;
+    protected startingSpeed: number = 1000;
     protected aimingType: AimingTypes = 1;
     protected spread: number = Math.PI/36;
 
     constructor(id: string, startingPoint: Vector2D, targetPoint: Vector2D) {
         super(id, startingPoint);
 
-        this.targetPoint = this.getTargetPoint(targetPoint);
-
+        this.direction = this.getDirection(startingPoint, targetPoint);
         this.position = {x: startingPoint.x, y: startingPoint.y};
 
-        const dist = VectorDistance(startingPoint, this.targetPoint);
-        this.finishTime = dist/this.speed;
+        this.speed = this.startingSpeed;
     }
 }

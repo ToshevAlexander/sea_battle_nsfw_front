@@ -49,6 +49,7 @@ import { saveData } from "./backend_service";
       position: {x: 40, y: 455},
       direction: 90,
       weaponConfig: ['howitzer', 'ak630'],
+      // weaponConfig: [],
       team: 2
     }
   ];
