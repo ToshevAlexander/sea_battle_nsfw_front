@@ -2,6 +2,7 @@ import { Container, Graphics, Assets, Sprite } from "pixi.js";
 import { saveData } from "./backend_service";
 import { AK630, BaseWeapon, Howitzer } from "./base_weapon";
 import { BaseProjectile } from "./base_projectile";
+import { VectorDistance } from "./vactor_helpers";
 
 interface IWeaponSlot {
     position: {x: number; y: number;}
@@ -238,6 +239,27 @@ export class CombatArea {
                 item.update(t);
             }
         });
+
+        this.activeProjectiles.forEach((proj) => {
+            const projPos = proj.container.position;
+            let collision = false;
+            let hitShip = null;
+
+            this.activeObjecs.forEach((ship) => {
+                const shipPos = ship.container.position;
+
+                const dist = VectorDistance(shipPos, projPos);
+
+                if (dist < 10 && !collision) {
+                    collision = true;
+                    hitShip = ship;
+
+                    proj.active = false;
+
+                    console.log("HIT!");
+                }
+            })
+        })
 
         this.activeProjectiles = this.activeProjectiles.filter((item) => {
             if (!item.active) {

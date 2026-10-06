@@ -71,7 +71,7 @@ export class BaseProjectile {
 
         this.container.position.set(this.position.x, this.position.y);
 
-        this.speed *= 0.98;
+        this.speed *= 0.985;
         if (this.currentTime >= 2.5 || this.speed < 100) {this.active = false;}
     }
 
