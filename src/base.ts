@@ -9,6 +9,7 @@ interface IWeaponSlot {
 
 export class BaseShip {
     protected id: string;
+    protected team_id: number;
     protected position: { x: number; y: number; } = { x: 0, y: 0 };
     protected moveVector: {x: number; y: number; };
     protected speed: number;
@@ -23,8 +24,9 @@ export class BaseShip {
     protected direction: number = 0;
     public container: Container = new Container();
 
-    constructor(id: string, weaponConfig: string[]) {
+    constructor(id: string, team_id: number, weaponConfig: string[]) {
         this.id = id;
+        this.team_id = team_id;
 
         this.initWeapons(weaponConfig);
     }
@@ -47,7 +49,7 @@ export class BaseShip {
     }
 
     private findTargets(CA: CombatArea) {
-        const otherShips = CA.activeObjecs.filter((ship) => ship.id !== this.id);
+        const otherShips = CA.activeObjecs.filter((ship) => (ship.id !== this.id) && (ship.team_id !== this.team_id));
         return otherShips;
     }
 
@@ -165,11 +167,7 @@ export class CorvetShip extends BaseShip {
         }
     ];
 
-    protected sizeParams: {width: number; height: number} = {width: 20, height: 60};
-
-    constructor(id: string, weaponConfig: string[]) {
-        super(id, weaponConfig);
-    }
+    protected sizeParams: {width: number; height: number} = {width: 10, height: 30};
 }
 
 export class FregateShip extends BaseShip {
@@ -187,11 +185,7 @@ export class FregateShip extends BaseShip {
         }
     ];
 
-    protected sizeParams: {width: number; height: number} = {width: 25, height: 100};
-
-    constructor(id: string, weaponConfig: string[]) {
-        super(id, weaponConfig);
-    }
+    protected sizeParams: {width: number; height: number} = {width: 14, height: 50};
 }
 
 export type AreaSizeType = { height: number; width: number };
@@ -219,11 +213,11 @@ export class CombatArea {
         combatConfig.forEach((item) => {
             let newSeaBot;
             if (item.type === CorvetShip.typeName) {
-                newSeaBot = new CorvetShip(item.id, item.weaponConfig);
+                newSeaBot = new CorvetShip(item.id, item.team, item.weaponConfig);
             }
 
             if (item.type === FregateShip.typeName) {
-                newSeaBot = new FregateShip(item.id, item.weaponConfig);
+                newSeaBot = new FregateShip(item.id, item.team, item.weaponConfig);
             }
 
             newSeaBot.init();

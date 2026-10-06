@@ -26,7 +26,14 @@ export class BaseWeapon {
 
         if (this.currentFCD < this.fireCD) { return; }
 
-        const target = activeTargets[0];
+        // const target = activeTargets[0];
+        const target = activeTargets.reduce((tar, ship) => {
+            if (!tar) {
+                return ship;
+            } else {
+                return (tar.distance <= ship.distance) ? tar : ship;
+            }
+        }, null);
 
         if (target && target.distance <= this.range) {
             const globalP = this.container.getGlobalPosition();
